@@ -21,7 +21,3 @@ class Bishop < Piece
 		return choices
 	end
 end
-
-
-b = Bishop.new("white", [4, 4])
-print b.can_reach?([0,1])

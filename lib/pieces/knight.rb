@@ -14,6 +14,8 @@ class Knight < Piece
 	end
 
 	def path(destination)
-		return destination
+		path = Array.new
+		path << destination
+		return path
 	end
 end

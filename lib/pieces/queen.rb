@@ -27,6 +27,3 @@ class Queen < Piece
 		return choices
 	end
 end
-
-q = Queen.new("black", [5,1])
-print q.possible_moves

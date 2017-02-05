@@ -14,10 +14,7 @@ class King < Piece
 	end
 
 	def path(destination)
-		return destination
+		path = Array.new
+		path << destination
 	end
 end
-
-k = King.new("black", [5,3])
-puts k.symbol
-print k.possible_moves
