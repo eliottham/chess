@@ -1,14 +1,62 @@
+Dir["./pieces/*.rb"].each { |file| require file }
 class Board
-	attr_accessor :board
+	attr_accessor :square
 	def initialize
-		@board = Array.new(8)
-		for i in 0..8
-			@board[i] = Array.new(8)
-			for j in 0..8
-				@board[i][j] = nil
+		@square = Array.new(8)
+		for x in 0..7
+			@square[x] = Array.new(8)
+			for y in 0..7
+				@square[x][y] = nil
 			end
 		end
 	end
+
+	def set_pieces
+		piece_classes = ["Rook", "Knight", "Bishop"]
+		for i in 0..7
+			@square[i][1] = Pawn.new("white", [i, 1])
+			@square[i][6] = Pawn.new("black", [i, 6])
+		end
+		for i in 0..2
+			j = 7 - i
+			@square[i][0] = Kernel.const_get(piece_classes[i]).new("white", [i, 0])
+			@square[j][0] = Kernel.const_get(piece_classes[i]).new("white", [j, 0])
+			@square[i][7] = Kernel.const_get(piece_classes[i]).new("black", [i, 7])
+			@square[j][7] = Kernel.const_get(piece_classes[i]).new("black", [j, 7])
+		end
+		@square[3][0] = Queen.new("white", [3, 0])
+		@square[3][7] = Queen.new("black", [3, 7])
+		@square[4][0] = King.new("white", [4, 0])
+		@square[4][7] = King.new("black", [4, 7])
+	end
+	
+	def display
+		letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
+		print "\n"
+		for i in 0..7
+			print "  #{letters[i]}"
+		end
+		print "\n"
+		for y in (7).downto(0)
+			print "#{y + 1} "
+			for x in 0..7
+				if @square[x][y] != nil
+					print "#{@square[x][y].symbol}  "
+				else
+					print "#{letters[x]}#{y + 1} "
+				end
+			end
+			print "#{y + 1} \n"
+		end
+		for i in 0..7
+			print "  #{letters[i]}"
+		end
+		print "\n"
+	end
 end
 
+	b = Board.new
+	b.set_pieces
+	b.display
 
+	
