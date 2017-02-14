@@ -29,7 +29,7 @@ class Board
 		@square[4][0] = King.new("white", [4, 0])
 		@square[4][7] = King.new("black", [4, 7])
 	end
-	
+
 	def display
 		letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
 		print "\n"
@@ -53,10 +53,45 @@ class Board
 		end
 		print "\n"
 	end
+
+	def object_at(position)
+		x = position[0]
+		y = position[1]
+		square = @square[x][y]
+		return square
+	end
+
+	def path_clear?(initial, target)
+		initial = object_at(initial)
+		path = initial.path(target)
+		path.pop
+		path.each do |position|
+			square = object_at(position)
+			return false if square != nil
+		end
+		return true if object_at(target) == nil
+		if initial.color != object_at(target).color
+			return true
+		else
+			return false
+		end
+	end
+
+	def move(initial, target)
+		if path_clear?(initial, target)
+			@square[target[0]][target[1]] = object_at(initial)
+			@square[initial[0]][initial[1]] = nil
+		end
+	end
 end
+
+
+
 
 	b = Board.new
 	b.set_pieces
+	b.display
+	b.move([0, 1], [0, 2])
 	b.display
 
 	
