@@ -1,10 +1,11 @@
 class Piece
 	attr_reader :color, :symbol
-	attr_accessor :position
+	attr_accessor :position, :moved
 
 	def initialize(color, position)
 		@color = color
 		@position = position
+		@moved = false
 		set_symbol
 	end
 

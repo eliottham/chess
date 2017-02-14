@@ -14,8 +14,8 @@ class Pawn < Piece
 				choices << [@position[0] + offset[0], @position[1] - offset[1]]
 			end
 		end
-		choices << [@position[0], @position[1] + 2] if @position[0] == 1 && @color == "white"
-		choices << [@position[0], @position[1] - 2] if @position[0] == 6 && @color == "black"
+		choices << [@position[0], @position[1] + 2] if @position[1] == 1 && @color == "white"
+		choices << [@position[0], @position[1] - 2] if @position[1] == 6 && @color == "black"
 		return choices.select{ |p| (0..7).include?(p[0]) && (0..7).include?(p[1]) }
 	end
 
