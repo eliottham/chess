@@ -6,9 +6,10 @@ class Board
 		for x in 0..7
 			@square[x] = Array.new(8)
 			for y in 0..7
-				@square[x][y] = nil
+				@square[x][y] = Blank.new([x, y])
 			end
 		end
+		set_pieces
 	end
 
 	def set_pieces
@@ -40,7 +41,7 @@ class Board
 		for y in (7).downto(0)
 			print "#{y + 1} "
 			for x in 0..7
-				if @square[x][y] != nil
+				if @square[x][y].class != Blank
 					print "#{@square[x][y].symbol}  "
 				else
 					print "#{letters[x]}#{y + 1} "
@@ -57,41 +58,35 @@ class Board
 	def object_at(position)
 		x = position[0]
 		y = position[1]
-		square = @square[x][y]
-		return square
+		object = @square[x][y]
+		return object
 	end
 
-	def path_clear?(initial, target)
+	def legal_move?(initial, target)
 		initial = object_at(initial)
-		path = initial.path(target)
-		path.pop
-		path.each do |position|
-			square = object_at(position)
-			return false if square != nil
+		target = object_at(target)
+		return false if initial.class == Blank
+		if initial.color != target.color
+			return true if initial.class == Pawn or initial.class == Knight
+			path = initial.path(target.position)
+			path.pop
+			path.each do |position|
+				square = object_at(position)
+				return false if square.class != Blank
+			end	
+			return true
 		end
-		return true if object_at(target) == nil
-		if initial.color != object_at(target).color
+		return false
+	end
+
+	def move(initial, target)
+		if object_at(initial).can_reach?(target) and legal_move?(initial, target)
+			object_at(initial).position = target
+			@square[target[0]][target[1]] = object_at(initial)
+			@square[initial[0]][initial[1]] = Blank.new([initial[0], initial[1]])
 			return true
 		else
 			return false
 		end
 	end
-
-	def move(initial, target)
-		if path_clear?(initial, target)
-			@square[target[0]][target[1]] = object_at(initial)
-			@square[initial[0]][initial[1]] = nil
-		end
-	end
 end
-
-
-
-
-	b = Board.new
-	b.set_pieces
-	b.display
-	b.move([0, 1], [0, 2])
-	b.display
-
-	
