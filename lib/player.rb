@@ -23,4 +23,12 @@ class Player
 			end
 		end
 	end
+
+	def king(board)
+		for x in 0..7
+			for y in 0..7
+				return board.square[x][y] if board.square[x][y].class == King and board.square[x][y].color == @color
+			end
+		end
+	end
 end

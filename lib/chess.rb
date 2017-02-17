@@ -11,13 +11,48 @@ class Chess
 		game
 	end 
 
-	def check?(player)
+	def check(player)
+		@check_pieces = Array.new
 		enemy_king = player.enemy_king(@board)
 		player.pieces(@board).each do |piece|
-			return true if piece.can_reach?(enemy_king.position) and @board.legal_move?(piece.position, enemy_king.position) == true
+			if piece.can_reach?(enemy_king.position) and @board.legal_move?(piece.position, enemy_king.position) == true
+				@check_pieces << piece
+			end
 		end
-		return false
+		@check_pieces = @check_pieces.compact
 	end
+
+	def check_response(player)
+		king = player.king(@board)
+		print king.legal_moves(@board, @check_pieces)
+	end
+=begin		@check_pieces.each do |piece|
+			legal_moves << piece.possible_moves & king.possible_moves
+		end
+		if legal_moves.compact.empty?
+			player.color == "white" ? winner = "Black" : winner = "White"
+			puts "Checkmate! #{winner} is the winner!"
+			return
+		end
+		@initial_square = king.position
+		puts "#{player.color.capitalize} turn."
+		puts "Enter the square you want your king to move to:"
+		@destination_square = user_parse(gets.chomp)
+		if legal_moves.any?{ |position| position == @destination_square }
+			if @board.move(@initial_square, @destination_square) == true
+				@board.move(@initial_square, @destination_square)
+				@turn += 1
+				game
+			end
+		end
+		puts "Illegal move! Try again."
+		check_response(player)
+	end
+=end		
+
+
+
+
 
 	def user_parse(string)
 		letter_hash = {a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7}
@@ -53,9 +88,11 @@ class Chess
 		@turn % 2 == 0 ? player = @p1 : player = @p2
 		@board.display
 		command(player)
-		if check?(player)
+		check(player)
+		if !@check_pieces.empty?
+			@turn % 2 == 0 ? player = @p1 : player = @p2
 			@board.display
-			puts "Check!"
+			check_response(player)
 		end
 		game
 	end

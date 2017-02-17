@@ -24,6 +24,6 @@ class Queen < Piece
 		bot_left_path.each do |square|
 			choices << square
 		end
-		return choices
+		return choices.delete_if{ |square| square == @position }
 	end
 end
