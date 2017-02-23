@@ -32,7 +32,7 @@ class Pawn < Piece
 	end
 
 	def legal_move?(destination, board)
-		return false if can_reach?(destination) == false
+		return false if !can_reach?(destination)
 		if @position[0] == destination[0]
 			return false if board.object_at(destination).class != Blank
 		else

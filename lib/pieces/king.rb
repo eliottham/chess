@@ -10,28 +10,54 @@ class King < Piece
 		offset.each do |offset|
 			choices << [@position[0] + offset[0], @position[1] + offset[1]]
 		end
+		choices = choices.select{ |p| (0..7).include?(p[0]) && (0..7).include?(p[1]) }
 		return choices.delete_if{ |square| square == @position }
 	end
 
-	def potential_moves(threat, board)
-		reach = Array.new
-		threat.each do |piece|
-			reach << piece.position
-			temp = piece.possible_moves & possible_moves
-			temp.each do |position|
-				reach << position
+	def safe_at?(position, board)
+		enemy_team = Array.new
+		@team = Array.new
+		board.square.each do |x|
+			for i in 0...board.square.length
+				if x[i].color != @color and x[i].class != Blank
+					enemy_team << x[i]
+				elsif x[i].color == @color and x[i].class != Blank and x[i].class != King
+					@team << x[i]
+				end
 			end
 		end
-		reach = reach.compact
-		reach.delete_if{ |destination| legal_move?(destination, board) == false }
-		threat.each do |piece|
-			reach.delete_if{ |destination| piece.legal_move?(destination, board) == true }
+		@threat = Array.new
+		enemy_team.each do |piece|
+			if piece.legal_move?(position, board)
+				@threat << piece
+			end
 		end
-		return reach
+		return true if @threat.empty?
+		return false
 	end
 
-	def path(destination)
-		path = Array.new
-		path << destination
+	def legal_move?(destination, board)
+		return false if !can_reach?(destination)
+		return false if board.object_at(destination).color == @color
+		return false if safe_at?(destination, board) == false
+		return true
+	end
+
+	def checkmate?(board)
+		return false if safe_at?(@position, board) == true
+		options = possible_moves
+		options.delete_if{ |position| legal_move?(position, board) == false }
+		flag = 0
+
+		@threat.each do |piece|
+			path = piece.path(@position)
+			path.each do |position|
+				if @team.any?{ |team| team.legal_move?(position, board) } == true
+					flag += 1
+				end
+			end
+		end
+		return false if flag != 0 or !options.empty?
+		return true
 	end
 end

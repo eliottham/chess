@@ -1,82 +1,57 @@
 Dir["./pieces/*.rb"].each { |file| require file }
 class Player
-	attr_reader :color, :king, :threat, :options
+	attr_reader :color
 
 	def initialize(color, board)
 		@color = color
 		@board = board
 	end
 
-	def pieces_on_board
-		@team = Array.new
-		@enemy_team = Array.new
-		for x in 0..7
-			for y in 0..7
-				@team << @board.square[x][y] if @board.square[x][y].class != Blank and @board.square[x][y].color == @color
-				@enemy_team << @board.square[x][y] if @board.square[x][y].class != Blank and @board.square[x][y].color != @color
-				@king = @board.square[x][y] if @board.square[x][y].class == King and @board.square[x][y].color == @color
-				@enemy_king = @board.square[x][y] if @board.square[x][y].class == King and @board.square[x][y].color != @color
+	def king
+		@board.square.each do |x|
+			for i in 0...@board.square.length
+				@king = x[i] if x[i].class == King and x[i].color == @color
 			end
 		end
-	end
-
-	def king_safe_at?(position=@king.position)
-		@threat = Array.new
-		@enemy_team.each do |piece|
-			if piece.possible_moves.include?(position) and piece.legal_move?(position, @board)
-				@threat << piece
-			end
-		end
-		return true if @threat.empty?
-		return false
-	end
-
-	def king_options
-		@options = @king.potential_moves(@threat, @board)
-		@options.delete_if{ |position| king_safe_at?(position) == false }
-		@options.delete_if{ |position| @king.legal_move?(position, @board) == false }
-		@options.delete_if{ |position| @king.can_reach?(position) == false }
+		return @king
 	end
 
 	def king_command
-		king_options
-		puts "#{@color.capitalize}'s King is in check!"
-		puts "Enter the square you want your King to move."
+		king
+		puts "Check! #{@color.capitalize} must protect their King!"
+		puts "Enter the square of the piece you want to move:"
+		@initial = user_parse(gets.chomp)
+		return puts "Invalid input. Try again." if @initial == false
+		puts "Enter the square you want the piece to move to: (Type 'b' to go back)"
 		@destination = user_parse(gets.chomp)
-		if @destination == false
-			puts "Invalid input. Try again"
-			king_command
-		end
-		if !@options.include?(@destination)
-			puts "You cannot move your King there!. Try again."
-			king_command
-		end
+		return false if @destination == "b"	
+		return puts "Invalid input. Try again." if @destination == false
+		return puts "You don't have a piece here! Try again." if @board.object_at(@initial).color != @color
+		return puts "Illegal move! Try again." if @board.object_at(@initial).legal_move?(@destination, @board) == false
+		temp_init = @board.object_at(@initial)
+		temp_dest = @board.object_at(@destination)
 		@board.move(@initial, @destination)
+		if @king.safe_at?(@king.position, @board) == false
+			@board.square[@initial[0]][@initial[1]] = temp_init
+			@board.square[@destination[0]][@destination[1]] = temp_dest
+			return puts "Illegal move! Your King is still in danger! Try again."
+		end
+		return true
 	end
 
 	def command
-		puts "#{@color.capitalize} turn."
+		puts "#{@color.capitalize}'s turn."
 		puts "Enter the square of the piece you want to move:"
 		@initial = user_parse(gets.chomp)
-		if @initial == false
-			puts "Invalid input. Try again"
-			command
-		end
+		return puts "Invalid input. Try again." if @initial == false
 		puts "Enter the square you want the piece to move to: (Type 'b' to go back)"
 		@destination = user_parse(gets.chomp)
-		if @destination == false or @destination == "b"
-			puts "Invalid input. Try again" if @destination == false
-			command
-		end
+		return false if @destination == "b"	
+		return puts "Invalid input. Try again." if @destination == false
 		return puts "You don't have a piece here! Try again." if @board.object_at(@initial).color != @color
 		return puts "Illegal move! Try again." if @board.object_at(@initial).legal_move?(@destination, @board) == false
-		if @board.object_at(@initial) == @king
-			if !@options.include?(@destination)
-				puts "You cannot move your King there!. Try again."
-				command
-			end
-		end
 		@board.move(@initial, @destination)
+		return true
 	end
 
 	def user_parse(string)

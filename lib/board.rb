@@ -69,11 +69,3 @@ class Board
 		@square[initial[0]][initial[1]] = Blank.new([initial[0], initial[1]])
 	end
 end
-
-
-
-
-
-
-
-

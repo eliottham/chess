@@ -101,7 +101,7 @@ class Piece
 	end
 
 	def legal_move?(destination, board)
-		return false if can_reach?(destination) == false
+		return false if !can_reach?(destination)
 		path = path(destination)
 		path.pop
 		path.each do |square|
