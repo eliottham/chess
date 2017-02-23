@@ -99,4 +99,15 @@ class Piece
 		return bot_right_path(destination) if bot_right_path(destination).include?(destination)
 		return bot_left_path(destination) if bot_left_path(destination).include?(destination)
 	end
+
+	def legal_move?(destination, board)
+		return false if can_reach?(destination) == false
+		path = path(destination)
+		path.pop
+		path.each do |square|
+			return false if board.object_at(square).class != Blank
+		end
+		return false if @color == board.object_at(destination).color
+		return true
+	end
 end

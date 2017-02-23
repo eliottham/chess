@@ -14,8 +14,8 @@ class Pawn < Piece
 				choices << [@position[0] + offset[0], @position[1] - offset[1]]
 			end
 		end
-		choices << [@position[0], @position[1] + 2] if @position[1] == 1 && @color == "white"
-		choices << [@position[0], @position[1] - 2] if @position[1] == 6 && @color == "black"
+		choices << [@position[0], @position[1] + 2] if @moved == false && @color == "white"
+		choices << [@position[0], @position[1] - 2] if @moved == false && @color == "black"
 		return choices.select{ |p| (0..7).include?(p[0]) && (0..7).include?(p[1]) }
 	end
 
@@ -29,5 +29,15 @@ class Pawn < Piece
 			path << destination
 		end
 		return path
+	end
+
+	def legal_move?(destination, board)
+		return false if can_reach?(destination) == false
+		if @position[0] == destination[0]
+			return false if board.object_at(destination).class != Blank
+		else
+			return false if @color == board.object_at(destination).color or board.object_at(destination).class == Blank
+		end
+		return true
 	end
 end

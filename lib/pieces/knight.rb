@@ -18,4 +18,9 @@ class Knight < Piece
 		path << destination
 		return path
 	end
+
+	def legal_move?(destination, board)
+		return false if @color == board.object_at(destination).color
+		return can_reach?(destination)
+	end
 end

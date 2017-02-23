@@ -13,17 +13,21 @@ class King < Piece
 		return choices.delete_if{ |square| square == @position }
 	end
 
-	def legal_moves(board, check_pieces)
-		illegal_moves = Array.new
-		check_pieces.each do |piece|
+	def potential_moves(threat, board)
+		reach = Array.new
+		threat.each do |piece|
+			reach << piece.position
 			temp = piece.possible_moves & possible_moves
 			temp.each do |position|
-				illegal_moves << position
+				reach << position
 			end
 		end
-		choices = possible_moves - illegal_moves
-		choices = choices.delete_if{ |target| board.legal_move?(@position, target) == false }
-		return choices
+		reach = reach.compact
+		reach.delete_if{ |destination| legal_move?(destination, board) == false }
+		threat.each do |piece|
+			reach.delete_if{ |destination| piece.legal_move?(destination, board) == true }
+		end
+		return reach
 	end
 
 	def path(destination)

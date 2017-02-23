@@ -62,31 +62,18 @@ class Board
 		return object
 	end
 
-	def legal_move?(initial, target)
-		initial = object_at(initial)
-		target = object_at(target)
-		return false if initial.class == Blank
-		if initial.color != target.color
-			return true if initial.class == Pawn or initial.class == Knight
-			path = initial.path(target.position)
-			path.pop
-			path.each do |position|
-				square = object_at(position)
-				return false if square.class != Blank
-			end	
-			return true
-		end
-		return false
-	end
-
 	def move(initial, target)
-		if object_at(initial).can_reach?(target) and legal_move?(initial, target)
-			object_at(initial).position = target
-			@square[target[0]][target[1]] = object_at(initial)
-			@square[initial[0]][initial[1]] = Blank.new([initial[0], initial[1]])
-			return true
-		else
-			return false
-		end
+		object_at(initial).position = target
+		object_at(initial).moved = true
+		@square[target[0]][target[1]] = object_at(initial)
+		@square[initial[0]][initial[1]] = Blank.new([initial[0], initial[1]])
 	end
 end
+
+
+
+
+
+
+
+
